@@ -26,7 +26,7 @@ const openDb=async function(){
   }
   
 
-  const addTask =async function  () {
+  const addTask =async function  (taskObj) {
     const db = await idb.openDB('Task', 1, {
       upgrade (db) {
         if (!db.objectStoreNames.contains('user_task')) {
@@ -41,7 +41,7 @@ const openDb=async function(){
   
     await Promise.all([
       tx.store.add({
-        task_title: 'task 2',
+        task_title: 'task 1',
         created: new Date().getTime(),
       }),
       tx.done
@@ -50,4 +50,4 @@ const openDb=async function(){
 
 
 //   createStoreInDB();
-  addTask();
+//   addTask();
