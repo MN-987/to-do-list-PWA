@@ -9,8 +9,9 @@ let selectedYear = '';
 let selectedDate = '';
 let taskObject={};
 let notifyCheckBox='';
+let arrOfAllTasks=[];
 
-addTaskButton.addEventListener('click', function () {
+addTaskButton.addEventListener('click', function async () {
     taskTitle = document.querySelectorAll('input[type=text]')[0].value;
     selectedHours = document.querySelectorAll('input[type=number]')[0].value;
     selectedMinutes = document.querySelectorAll('input[type=number]')[1].value;
@@ -30,5 +31,7 @@ addTaskButton.addEventListener('click', function () {
         year:selectedYear,
         month:selectedMonth
     }
-    console.log(`task object created`,taskObject)
+    addTask(taskObject);
+    getAllTasks().then(data=>{ drawTasksTable(data)});
+    
 });
