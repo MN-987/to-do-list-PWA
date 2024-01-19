@@ -3,6 +3,8 @@
 //     console.log('Notification permission ,',status)
 //   })
 
+
+
 function displayNotification(msg) {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').then(registration => {
@@ -68,7 +70,18 @@ addTaskButton.addEventListener('click', function async () {
         month:selectedMonth
     }
     addTask(taskObject);
-    getAllTasks().then(data=>{ drawTasksTable(data)});
+    getAllTasks().then(data=>{ 
+        drawTasksTable(data)
+        deleteButtons=document.querySelectorAll('#deleteButton');
+        deleteButtons.forEach(delObj=>{
+            delObj.addEventListener('click',(e)=>{
+                handleTaskDeleteButton(e);
+            })
+        })
+        
+    
+    });
+    
 
 });
 
@@ -94,7 +107,7 @@ const startInterval = async () => {
     // Use a regular function as the setInterval callback
     setInterval(async () => {
       await checkDeadline(); // Call the function inside the setInterval
-    }, 10000);
+    }, 7000);
   };
 
   startInterval();
