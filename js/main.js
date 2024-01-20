@@ -9,7 +9,7 @@ const dbPromise = await idb.openDB('Tasks',1)
 
 
  const createStoreInDB =async function (){
-    const dbPromise = await idb.openDB('Tasks', 1, {
+    const dbPromise = await idb.openDB('Task', 1, {
       upgrade (db) {
         if (!db.objectStoreNames.contains('user_task')) {
             const userTaskObjectStore=db.createObjectStore('user_task',{keyPath:'task_title'});
@@ -98,27 +98,40 @@ const dbPromise = await idb.openDB('Tasks',1)
     })
   ])
 }
-
 const checkDeadline = async function () {
-  const db = await idb.openDB('Task', 1);
-  const tx = await db.transaction('user_task', 'readonly');
-  const store = tx.objectStore('user_task');
-   currentDate = new Date();
+  const databases = await indexedDB.databases();
+  
+  const taskDatabases = databases.filter(db => db.name === "Task");
 
-  let cursor = await store.openCursor();
-  while (cursor) {
-      const task = cursor.value;
-      const taskDate = new Date(task.year, task.month - 1, task.day, parseInt(task.hours) + 12, task.minutes);
-      console.log(` from checkDeadline fucntion ` ,task,` and task date is `, taskDate , ` and current date is ` ,currentDate)
-      if (currentDate > taskDate &&  task.hasOwnProperty('notified') && task.notified === true) {
-        displayNotification(`HEY! Your "${task.task_title}" is now overdue.`)
-        updateTask(task);
-    cursor.value.notified=false;
+  if (taskDatabases.length > 0) {
+
+    
+      const db = await idb.openDB('Task', 1);
+      const tx = await db.transaction('user_task', 'readonly');
+      const store = tx.objectStore('user_task');
+      const currentDate = new Date();
+    
+      let cursor = await store.openCursor();
+    
+      while (cursor) {
+        const task = cursor.value;
+        const taskDate = new Date(task.year, task.month - 1, task.day, parseInt(task.hours) + 12, task.minutes);
+    
+        console.log(` from checkDeadline function `, task, ` and task date is `, taskDate, ` and current date is `, currentDate);
+    
+        if (currentDate > taskDate && task.hasOwnProperty('notified') && task.notified === true) {
+          displayNotification(`HEY! Your "${task.task_title}" is now overdue.`);
+          updateTask(task);
+          cursor.value.notified = false;
+        }
+    
+        cursor = await cursor.continue();
       }
-     cursor= await cursor.continue();
+    
+      tx.done;
   }
-  tx.done;
 };
+
 
 
 
@@ -140,5 +153,5 @@ function handleTaskDeleteButton(e){
 
 }
 
-//   createStoreInDB();
-//   addTask();
+  createStoreInDB();
+  // addTask();
