@@ -1,8 +1,8 @@
 let taskName=''; 
 
 const openDb=async function(){
-    console.log(`entered`)
-    const dbPromise = await idb.openDB('Tasks',1)
+  
+const dbPromise = await idb.openDB('Tasks',1)
  console.log(dbPromise)
 }
 // openDb();
@@ -11,14 +11,10 @@ const openDb=async function(){
  const createStoreInDB =async function (){
     const dbPromise = await idb.openDB('Tasks', 1, {
       upgrade (db) {
-    
         if (!db.objectStoreNames.contains('user_task')) {
-        
             const userTaskObjectStore=db.createObjectStore('user_task',{keyPath:'task_title'});
-
             userTaskObjectStore.createIndex('task_title', 'task_title', { unique: false });
           }      
-
           else{
             console.log(`else enterd`)
           }
@@ -26,7 +22,6 @@ const openDb=async function(){
     });
   }
   
-
   const addTask =async function  (taskObj) {
     const db = await idb.openDB('Task', 1, {
       upgrade (db) {
@@ -86,15 +81,20 @@ const openDb=async function(){
 } 
 
 
- const updateTask=async function(taskName){
+ const updateTask=async function(taskObj){
   const db=await idb.openDB('Task',1);
 
   const tx = await db.transaction('user_task', 'readwrite');
   await Promise.all([
 
     tx.store.put({
-      task_title:taskName,
-      notified:false
+      task_title:taskObj.task_title,
+        day:taskObj.day,
+        hours:taskObj.hours,
+        minutes:taskObj.minutes,
+        notified:false,
+        year:taskObj.year,
+        month:taskObj.month
     })
   ])
 }
@@ -103,16 +103,16 @@ const checkDeadline = async function () {
   const db = await idb.openDB('Task', 1);
   const tx = await db.transaction('user_task', 'readonly');
   const store = tx.objectStore('user_task');
-  const currentDate = new Date();
+   currentDate = new Date();
 
   let cursor = await store.openCursor();
   while (cursor) {
       const task = cursor.value;
       const taskDate = new Date(task.year, task.month - 1, task.day, parseInt(task.hours) + 12, task.minutes);
-      //console.log(` from checkDeadline fucntion ` ,task,` and task date is `, taskDate , ` and current date is ` ,currentDate)
-      if (task.hasOwnProperty('notified') && task.notified === true) {
+      console.log(` from checkDeadline fucntion ` ,task,` and task date is `, taskDate , ` and current date is ` ,currentDate)
+      if (currentDate > taskDate &&  task.hasOwnProperty('notified') && task.notified === true) {
         displayNotification(`HEY! Your "${task.task_title}" is now overdue.`)
-        updateTask(task.task_title);
+        updateTask(task);
     cursor.value.notified=false;
       }
      cursor= await cursor.continue();
@@ -133,9 +133,11 @@ function handleTaskDeleteButton(e){
   taskName = e.target.closest('tr').childNodes[0].innerText.split('-')[0];
   
   
-  deleteItemFromStore(taskName)
-  getAllTasks().then(data=>{ 
-    drawTasksTable(data)})
+  deleteItemFromStore(taskName).then(()=>{
+    getAllTasks().then(data=>{ 
+      drawTasksTable(data)})
+  }).catch(err=>console.log(err))
+
 }
 
 //   createStoreInDB();

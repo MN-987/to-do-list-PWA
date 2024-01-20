@@ -1,9 +1,4 @@
-
-// Notification.requestPermission(status=>{
-//     console.log('Notification permission ,',status)
-//   })
-
-
+const  tasksTable= document.querySelector('#to-do-table') 
 
 function displayNotification(msg) {
     if ('serviceWorker' in navigator) {
@@ -49,7 +44,7 @@ let taskObject={};
 let notifyCheckBox='';
 let arrOfAllTasks=[];
 
-addTaskButton.addEventListener('click', function async () {
+addTaskButton.addEventListener('click',     async function  () {
     taskTitle = document.querySelectorAll('input[type=text]')[0].value;
     selectedHours = document.querySelectorAll('input[type=number]')[0].value;
     selectedMinutes = document.querySelectorAll('input[type=number]')[1].value;
@@ -70,19 +65,17 @@ addTaskButton.addEventListener('click', function async () {
         month:selectedMonth
     }
     addTask(taskObject);
-    getAllTasks().then(data=>{ 
-        drawTasksTable(data)
-        deleteButtons=document.querySelectorAll('#deleteButton');
-        deleteButtons.forEach(delObj=>{
-            delObj.addEventListener('click',(e)=>{
-                handleTaskDeleteButton(e);
-            })
-        })
-        
-    
-    });
-    
+    const data = await getAllTasks();
+    drawTasksTable(data);
+});
 
+
+tasksTable.addEventListener('click', function (e) {
+    console.log('table clicked')
+    const target = e.target;
+    if (target && target.id === 'deleteButton') {
+        handleTaskDeleteButton(e);
+    }
 });
 
 
