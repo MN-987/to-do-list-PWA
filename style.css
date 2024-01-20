@@ -86,3 +86,22 @@
 }
 
 
+.table{
+    border: 2px solid #FDF7E4;
+}
+tr{
+    border-bottom:2px solid #FDF7E4 !important;
+}
+td{
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 600;
+}
+.table button{
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
+}
+button:hover{
+background-color: rgba(255, 0, 0, 0.452) !important;
+}
